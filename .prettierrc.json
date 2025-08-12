@@ -1,5 +1,4 @@
 {
-  "plugins": ["prettier-plugin-astro"],
   "singleQuote": true,
   "arrowParens": "avoid",
   "endOfLine": "lf",
