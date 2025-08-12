@@ -1,5 +1,7 @@
+import type { Component } from 'vue';
+
 export interface Sound {
-  icon: React.ReactNode;
+  icon?: Component;
   id: string;
   label: string;
   src: string;
@@ -8,7 +10,7 @@ export interface Sound {
 export type Sounds = Array<Sound>;
 
 export interface Category {
-  icon: React.ReactNode;
+  icon?: Component;
   id: string;
   sounds: Sounds;
   title: string;
