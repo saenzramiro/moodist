@@ -1,1 +1,0 @@
-export { IsochronicModal } from './isochronic';

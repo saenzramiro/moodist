@@ -28,6 +28,13 @@ export const usePlaybackStore = defineStore('playback', {
       this.playing = true;
       Object.values(this.active).forEach(e => {
         if (!e.howl.playing()) e.howl.play();
+        e.howl.volume(e.volume * this.globalVolume);
+      });
+    },
+    setGlobalVolume(value: number) {
+      this.globalVolume = value;
+      Object.values(this.active).forEach(e => {
+        e.howl.volume(e.volume * this.globalVolume);
       });
     },
     setVolume(id: string, value: number) {
@@ -39,7 +46,7 @@ export const usePlaybackStore = defineStore('playback', {
         return;
       }
       entry.volume = value;
-      entry.howl.volume(value);
+      entry.howl.volume(value * this.globalVolume);
       if (this.playing && !entry.howl.playing()) entry.howl.play();
     },
     toggleSound(sound: Sound) {
@@ -49,13 +56,18 @@ export const usePlaybackStore = defineStore('playback', {
         delete this.active[sound.id];
         return;
       }
-      const howl = new Howl({ loop: true, src: [sound.src], volume: 0.5 });
+      const howl = new Howl({
+        loop: true,
+        src: [sound.src],
+        volume: 0.5 * this.globalVolume,
+      });
       if (this.playing) howl.play();
       this.active[sound.id] = { howl, volume: 0.5 };
     },
   },
   state: () => ({
     active: {} as Record<string, ActiveSound>,
+    globalVolume: 1,
     playing: false,
   }),
 });

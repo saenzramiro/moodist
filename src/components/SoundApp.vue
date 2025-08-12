@@ -3,6 +3,7 @@
     <div class="controls">
       <a-button @click="togglePlay">{{ playing ? 'Pause' : 'Play' }}</a-button>
       <a-button @click="clear" type="text">🗑️</a-button>
+      <a-slider v-model:value="globalVolume" class="global-slider" @click.stop />
     </div>
     <div v-if="favoriteSounds.length" class="category">
       <h3>Favorites</h3>
@@ -30,14 +31,20 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import SoundItem from './SoundItem.vue';
-import { List, Button } from 'ant-design-vue';
+import { List, Button, Slider } from 'ant-design-vue';
 import { sounds } from '@/data/sounds';
 import { useFavoriteStore } from '@/stores/favorites';
 import { usePlaybackStore } from '@/stores/playback';
 
 export default defineComponent({
   name: 'SoundApp',
-  components: { SoundItem, AList: List, AListItem: List.Item, AButton: Button },
+  components: {
+    SoundItem,
+    AList: List,
+    AListItem: List.Item,
+    AButton: Button,
+    ASlider: Slider,
+  },
   data() {
     const favorites = useFavoriteStore();
     const playback = usePlaybackStore();
@@ -54,6 +61,14 @@ export default defineComponent({
     },
     playing(): boolean {
       return this.playback.playing;
+    },
+    globalVolume: {
+      get(): number {
+        return this.playback.globalVolume * 100;
+      },
+      set(val: number) {
+        this.playback.setGlobalVolume(val / 100);
+      },
     },
   },
   methods: {
@@ -77,5 +92,9 @@ export default defineComponent({
   display: flex;
   gap: 8px;
   margin-bottom: 16px;
+}
+
+.global-slider {
+  width: 120px;
 }
 </style>
