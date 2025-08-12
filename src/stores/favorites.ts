@@ -13,9 +13,15 @@ export const useFavoriteStore = defineStore('favorites', {
       } else {
         this.favorites.push(sound);
       }
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('favorites', JSON.stringify(this.favorites));
+      }
     },
   },
   state: () => ({
-    favorites: [] as Sound[],
+    favorites:
+      typeof localStorage !== 'undefined'
+        ? (JSON.parse(localStorage.getItem('favorites') || '[]') as Sound[])
+        : ([] as Sound[]),
   }),
 });

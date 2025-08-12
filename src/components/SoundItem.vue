@@ -1,5 +1,5 @@
 <template>
-  <a-card class="sound-card" hoverable @click="toggleActive">
+  <a-card class="sound-card" :class="{ active }" hoverable @click="toggleActive">
     <a-button class="favorite-btn" type="text" @click.stop="toggleFavorite">
       {{ isFavorite ? '♥' : '♡' }}
     </a-button>
@@ -8,21 +8,16 @@
       <span v-else>🔊</span>
     </div>
     <div class="label">{{ sound.label }}</div>
-    <a-slider
-      v-model:value="volume"
-      @change="handleVolume"
-      :disabled="!active"
-      @click.stop
-    />
+    <a-slider v-model:value="volume" :disabled="!active" @click.stop />
   </a-card>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { Howl } from 'howler';
 import type { Sound } from '@/data/types';
 import { Card, Slider, Button } from 'ant-design-vue';
 import { useFavoriteStore } from '@/stores/favorites';
+import { usePlaybackStore } from '@/stores/playback';
 
 export default defineComponent({
   name: 'SoundItem',
@@ -35,50 +30,32 @@ export default defineComponent({
   },
   data() {
     return {
-      volume: 0 as number,
-      howl: null as Howl | null,
-      active: false,
       favorites: useFavoriteStore(),
+      playback: usePlaybackStore(),
     };
   },
   computed: {
     isFavorite(): boolean {
       return this.favorites.isFavorite(this.sound.id);
     },
-  },
-  mounted() {
-    this.howl = new Howl({ src: [this.sound.src], loop: true, volume: 0 });
-  },
-  beforeUnmount() {
-    this.howl?.unload();
+    active(): boolean {
+      return this.playback.isActive(this.sound.id);
+    },
+    volume: {
+      get(): number {
+        return this.playback.getVolume(this.sound.id) * 100;
+      },
+      set(val: number) {
+        this.playback.setVolume(this.sound.id, val / 100);
+      },
+    },
   },
   methods: {
     toggleFavorite() {
       this.favorites.toggle(this.sound);
     },
     toggleActive() {
-      if (!this.howl) return;
-      if (this.active) {
-        this.howl.stop();
-        this.active = false;
-        this.volume = 0;
-      } else {
-        this.active = true;
-        this.volume = 50;
-        this.howl.volume(0.5);
-        this.howl.play();
-      }
-    },
-    handleVolume(value: number) {
-      if (!this.howl) return;
-      this.volume = value;
-      if (value === 0) {
-        this.howl.stop();
-        this.active = false;
-      } else {
-        this.howl.volume(value / 100);
-        if (!this.howl.playing()) this.howl.play();
-      }
+      this.playback.toggleSound(this.sound);
     },
   },
 });
@@ -88,6 +65,10 @@ export default defineComponent({
 .sound-card {
   text-align: center;
   position: relative;
+}
+
+.sound-card.active {
+  border: 2px solid #1890ff;
 }
 
 .favorite-btn {
