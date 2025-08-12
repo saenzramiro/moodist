@@ -3,6 +3,8 @@
     <SoundApp />
     <PomodoroTimer />
     <BreathingExercise />
+    <BinauralBeats />
+    <IsochronicTones />
   </Layout>
 </template>
 
@@ -12,6 +14,8 @@ import Layout from '@/layouts/Layout.vue';
 import SoundApp from '@/components/SoundApp.vue';
 import PomodoroTimer from '@/components/PomodoroTimer.vue';
 import BreathingExercise from '@/components/BreathingExercise.vue';
+import BinauralBeats from '@/components/BinauralBeats.vue';
+import IsochronicTones from '@/components/IsochronicTones.vue';
 
 export default defineComponent({
   name: 'HomePage',
@@ -20,6 +24,8 @@ export default defineComponent({
     SoundApp,
     PomodoroTimer,
     BreathingExercise,
+    BinauralBeats,
+    IsochronicTones,
   },
 });
 </script>

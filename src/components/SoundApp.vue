@@ -2,9 +2,11 @@
   <div id="app" class="sound-app">
     <div class="controls">
       <a-button @click="togglePlay">{{ playing ? 'Pause' : 'Play' }}</a-button>
+      <a-button @click="shuffle" type="text">🔀</a-button>
       <a-button @click="clear" type="text">🗑️</a-button>
       <a-slider v-model:value="globalVolume" class="global-slider" @click.stop />
     </div>
+    <Presets />
     <div v-if="favoriteSounds.length" class="category">
       <h3>Favorites</h3>
       <a-list :grid="grid" :data-source="favoriteSounds">
@@ -31,6 +33,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import SoundItem from './SoundItem.vue';
+import Presets from './Presets.vue';
 import { List, Button, Slider } from 'ant-design-vue';
 import { sounds } from '@/data/sounds';
 import { useFavoriteStore } from '@/stores/favorites';
@@ -40,6 +43,7 @@ export default defineComponent({
   name: 'SoundApp',
   components: {
     SoundItem,
+    Presets,
     AList: List,
     AListItem: List.Item,
     AButton: Button,
@@ -78,6 +82,19 @@ export default defineComponent({
     },
     clear() {
       this.playback.clear();
+    },
+    shuffle() {
+      const all = this.categories.flatMap((c: any) => c.sounds);
+      const favIds = new Set(this.favorites.favorites.map((f: any) => f.id));
+      const available = all.filter((s: any) => !favIds.has(s.id));
+      this.playback.clear();
+      const chosen: any[] = [];
+      for (let i = 0; i < 4 && available.length; i++) {
+        const idx = Math.floor(Math.random() * available.length);
+        chosen.push(available.splice(idx, 1)[0]);
+      }
+      chosen.forEach(s => this.playback.toggleSound(s));
+      this.playback.playAll();
     },
   },
 });
