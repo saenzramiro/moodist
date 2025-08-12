@@ -8,9 +8,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.astro",
+    "lint": "eslint . --ext .js,.ts,.vue",
     "lint:fix": "npm run lint -- --fix",
-    "lint:style": "stylelint ./**/*.{css,astro,html}",
+    "lint:style": "stylelint ./**/*.{css,html,vue}",
     "lint:style:fix": "npm run lint:style -- --fix",
     "format": "prettier . --write",
     "prepare": "husky install",
@@ -18,9 +18,7 @@
     "release": "standard-version --no-verify",
     "release:major": "npm run release -- --release-as major",
     "release:minor": "npm run release -- --release-as minor",
-    "release:patch": "npm run release -- --release-as patch",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "release:patch": "npm run release -- --release-as patch"
   },
   "dependencies": {
     "ant-design-vue": "^4.0.0",
@@ -33,7 +31,6 @@
     "vue-router": "^4.3.2"
   },
   "devDependencies": {
-    "@chromatic-com/storybook": "1.3.3",
     "@commitlint/cli": "17.7.2",
     "@commitlint/config-conventional": "17.7.0",
     "@typescript-eslint/eslint-plugin": "6.7.4",
@@ -47,8 +44,8 @@
     "eslint-import-resolver-alias": "1.1.2",
     "eslint-import-resolver-typescript": "3.6.1",
     "eslint-plugin-import": "2.28.1",
-    "eslint-plugin-jsx-a11y": "6.7.1",
     "eslint-plugin-prettier": "5.0.0",
+    "eslint-plugin-vue": "9.22.0",
     "eslint-plugin-sort-destructure-keys": "1.5.0",
     "eslint-plugin-sort-keys-fix": "1.1.2",
     "eslint-plugin-typescript-sort-keys": "3.1.0",
@@ -58,7 +55,6 @@
     "postcss-nesting": "12.0.1",
     "prettier": "3.0.3",
     "standard-version": "9.5.0",
-    "storybook": "8.0.9",
     "stylelint": "15.10.3",
     "stylelint-config-html": "1.1.0",
     "stylelint-config-recess-order": "4.4.0",
