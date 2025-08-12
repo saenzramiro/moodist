@@ -2,8 +2,7 @@
   <a-card class="breathing">
     <div class="exercise">
       <div class="timer">{{ minutes }}:{{ seconds }}</div>
-      <div class="circle" :class="currentPhase"></div>
-      <p class="phase">{{ phaseLabel }}</p>
+      <div class="circle" :class="currentPhase">{{ phaseLabel }}</div>
     </div>
     <div class="select">
       <select v-model="selectedExercise">
@@ -114,6 +113,11 @@ export default defineComponent({
   background: #1890ff;
   transform: scale(1);
   transition: transform 1s linear;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 16px;
 }
 .circle.inhale,
 .circle.holdInhale {
@@ -126,9 +130,6 @@ export default defineComponent({
 .timer {
   font-size: 24px;
   margin-bottom: 8px;
-}
-.phase {
-  margin-top: 8px;
 }
 .select {
   margin-top: 16px;

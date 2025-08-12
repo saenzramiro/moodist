@@ -8,7 +8,13 @@
       <span v-else>🔊</span>
     </div>
     <div class="label">{{ sound.label }}</div>
-    <a-slider v-model:value="volume" :disabled="!active" @click.stop />
+    <a-slider
+      v-model:value="volume"
+      :disabled="!active"
+      @click.stop
+      @mousedown.stop
+      @touchstart.stop
+    />
   </a-card>
 </template>
 

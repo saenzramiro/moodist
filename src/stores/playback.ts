@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { Howl } from 'howler';
+import { Howl, Howler } from 'howler';
 import type { Sound } from '@/data/types';
 
 interface ActiveSound {
@@ -33,6 +33,7 @@ export const usePlaybackStore = defineStore('playback', {
     },
     setGlobalVolume(value: number) {
       this.globalVolume = value;
+      Howler.volume(value);
       Object.values(this.active).forEach(e => {
         e.howl.volume(e.volume * this.globalVolume);
       });

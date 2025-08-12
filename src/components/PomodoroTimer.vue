@@ -12,12 +12,26 @@
       <a-button @click="restart" type="text">↺</a-button>
       <a-button @click="toggle">{{ running ? 'Pause' : 'Start' }}</a-button>
     </div>
+    <div class="info">
+      <span>Sessions: {{ sessions }}</span>
+      <a-button type="link" size="small" @click="showSettings = true">Change times</a-button>
+    </div>
+    <a-modal v-model:open="showSettings" title="Change times" @ok="applySettings">
+      <div class="settings">
+        <label>Pomodoro (min)</label>
+        <a-input-number v-model:value="form.pomodoro" :min="1" />
+        <label>Break (min)</label>
+        <a-input-number v-model:value="form.short" :min="1" />
+        <label>Long Break (min)</label>
+        <a-input-number v-model:value="form.long" :min="1" />
+      </div>
+    </a-modal>
   </a-card>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { Card, Button, Radio } from 'ant-design-vue';
+import { Card, Button, Radio, Modal, InputNumber } from 'ant-design-vue';
 
 export default defineComponent({
   name: 'PomodoroTimer',
@@ -26,6 +40,8 @@ export default defineComponent({
     AButton: Button,
     ARadioGroup: Radio.Group,
     ARadioButton: Radio.Button,
+    AModal: Modal,
+    AInputNumber: InputNumber,
   },
   data() {
     return {
@@ -38,6 +54,9 @@ export default defineComponent({
       } as Record<string, number>,
       timer: 25 * 60,
       interval: null as number | null,
+      sessions: 0,
+      showSettings: false,
+      form: { pomodoro: 25, short: 5, long: 15 },
     };
   },
   computed: {
@@ -57,6 +76,7 @@ export default defineComponent({
     tick() {
       this.timer -= 1;
       if (this.timer <= 0) {
+        if (this.selectedTab === 'pomodoro') this.sessions += 1;
         this.running = false;
         if (this.interval) clearInterval(this.interval);
       }
@@ -74,6 +94,13 @@ export default defineComponent({
       if (this.interval) clearInterval(this.interval);
       this.timer = this.times[this.selectedTab];
       this.running = false;
+    },
+    applySettings() {
+      this.times.pomodoro = this.form.pomodoro * 60;
+      this.times.short = this.form.short * 60;
+      this.times.long = this.form.long * 60;
+      this.showSettings = false;
+      this.restart();
     },
   },
   beforeUnmount() {
@@ -98,6 +125,19 @@ export default defineComponent({
 .controls {
   display: flex;
   justify-content: center;
+  gap: 8px;
+}
+
+.info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
   gap: 8px;
 }
 </style>
