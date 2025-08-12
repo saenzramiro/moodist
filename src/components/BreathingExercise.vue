@@ -9,12 +9,15 @@
         <option v-for="(value, key) in exerciseOptions" :key="key">{{ key }}</option>
       </select>
     </div>
+    <div class="controls">
+      <a-button @click="toggle">{{ running ? 'Stop' : 'Start' }}</a-button>
+    </div>
   </a-card>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { Card } from 'ant-design-vue';
+import { Card, Button } from 'ant-design-vue';
 
 const EXERCISE_PHASES = {
   '4-7-8 Breathing': ['inhale', 'holdInhale', 'exhale'],
@@ -37,7 +40,7 @@ const PHASE_LABELS: Record<string, string> = {
 
 export default defineComponent({
   name: 'BreathingExercise',
-  components: { ACard: Card },
+  components: { ACard: Card, AButton: Button },
   data() {
     return {
       selectedExercise: '4-7-8 Breathing',
@@ -45,6 +48,7 @@ export default defineComponent({
       timer: 0,
       phaseTimeout: null as number | null,
       timerInterval: null as number | null,
+      running: false,
     };
   },
   computed: {
@@ -73,14 +77,8 @@ export default defineComponent({
   watch: {
     selectedExercise() {
       this.phaseIndex = 0;
-      this.schedulePhase();
+      if (this.running) this.schedulePhase();
     },
-  },
-  mounted() {
-    this.schedulePhase();
-    this.timerInterval = setInterval(() => {
-      this.timer += 1;
-    }, 1000) as unknown as number;
   },
   beforeUnmount() {
     if (this.phaseTimeout) clearTimeout(this.phaseTimeout);
@@ -94,6 +92,28 @@ export default defineComponent({
         this.phaseIndex = (this.phaseIndex + 1) % this.phases.length;
         this.schedulePhase();
       }, duration) as unknown as number;
+    },
+    start() {
+      this.running = true;
+      this.timer = 0;
+      this.phaseIndex = 0;
+      this.schedulePhase();
+      this.timerInterval = setInterval(() => {
+        this.timer += 1;
+      }, 1000) as unknown as number;
+    },
+    stop() {
+      this.running = false;
+      if (this.phaseTimeout) clearTimeout(this.phaseTimeout);
+      if (this.timerInterval) clearInterval(this.timerInterval);
+      this.phaseTimeout = null;
+      this.timerInterval = null;
+      this.timer = 0;
+      this.phaseIndex = 0;
+    },
+    toggle() {
+      if (this.running) this.stop();
+      else this.start();
     },
   },
 });
@@ -132,6 +152,9 @@ export default defineComponent({
   margin-bottom: 8px;
 }
 .select {
+  margin-top: 16px;
+}
+.controls {
   margin-top: 16px;
 }
 </style>

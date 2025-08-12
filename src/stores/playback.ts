@@ -44,6 +44,7 @@ export const usePlaybackStore = defineStore('playback', {
       if (value === 0) {
         entry.howl.stop();
         delete this.active[id];
+        if (Object.keys(this.active).length === 0) this.playing = false;
         return;
       }
       entry.volume = value;
@@ -55,15 +56,20 @@ export const usePlaybackStore = defineStore('playback', {
       if (entry) {
         entry.howl.stop();
         delete this.active[sound.id];
+        if (Object.keys(this.active).length === 0) this.playing = false;
         return;
       }
+      const hadActive = Object.keys(this.active).length > 0;
       const howl = new Howl({
         loop: true,
         src: [sound.src],
         volume: 0.5 * this.globalVolume,
       });
-      if (this.playing) howl.play();
       this.active[sound.id] = { howl, volume: 0.5 };
+      if (this.playing || !hadActive) {
+        this.playing = true;
+        howl.play();
+      }
     },
   },
   state: () => ({

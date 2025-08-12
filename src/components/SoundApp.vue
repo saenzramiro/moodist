@@ -1,7 +1,10 @@
 <template>
   <div id="app" class="sound-app">
     <div class="controls">
-      <a-button @click="togglePlay">{{ playing ? 'Pause' : 'Play' }}</a-button>
+      <a-button
+        @click="togglePlay"
+        :disabled="playDisabled"
+      >{{ playLabel }}</a-button>
       <a-button @click="shuffle" type="text">🔀</a-button>
       <a-button @click="clear" type="text">🗑️</a-button>
       <a-slider v-model:value="globalVolume" class="global-slider" @click.stop />
@@ -65,6 +68,15 @@ export default defineComponent({
     },
     playing(): boolean {
       return this.playback.playing;
+    },
+    hasActive(): boolean {
+      return Object.keys(this.playback.active).length > 0;
+    },
+    playLabel(): string {
+      return this.playing ? 'Pause' : 'Play';
+    },
+    playDisabled(): boolean {
+      return !this.playing && !this.hasActive;
     },
     globalVolume: {
       get(): number {

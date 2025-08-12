@@ -1,7 +1,7 @@
 <template>
   <a-modal
     v-model:visible="visible"
-    :title="title"
+    title="Binaural Beats"
     @cancel="handleCancel"
     :footer="null"
   >
@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
+import { defineComponent } from 'vue';
 import { Modal, Select, InputNumber, Slider, Button, Form } from 'ant-design-vue';
 
 interface Preset {
@@ -50,7 +50,7 @@ const presetList: Preset[] = [
 ];
 
 export default defineComponent({
-  name: 'FrequencyModal',
+  name: 'BinauralModal',
   components: {
     AModal: Modal,
     ASelect: Select,
@@ -63,7 +63,6 @@ export default defineComponent({
   },
   props: {
     modelValue: { type: Boolean, required: true },
-    mode: { type: String as PropType<'binaural' | 'isochronic'>, required: true },
   },
   emits: ['update:modelValue'],
   data() {
@@ -76,16 +75,11 @@ export default defineComponent({
       ctx: null as AudioContext | null,
       oscL: null as OscillatorNode | null,
       oscR: null as OscillatorNode | null,
-      osc: null as OscillatorNode | null,
-      mod: null as OscillatorNode | null,
       gain: null as GainNode | null,
       playing: false,
     };
   },
   computed: {
-    title(): string {
-      return this.mode === 'binaural' ? 'Binaural Beats' : 'Isochronic Tones';
-    },
     presets(): Preset[] {
       return presetList;
     },
@@ -99,23 +93,15 @@ export default defineComponent({
       if (!val) this.stop();
     },
     base(val: number) {
-      if (this.mode === 'binaural') {
-        if (this.oscL && this.oscR) {
-          this.oscL.frequency.value = val - this.beat / 2;
-          this.oscR.frequency.value = val + this.beat / 2;
-        }
-      } else if (this.osc) {
-        this.osc.frequency.value = val;
+      if (this.oscL && this.oscR) {
+        this.oscL.frequency.value = val - this.beat / 2;
+        this.oscR.frequency.value = val + this.beat / 2;
       }
     },
     beat(val: number) {
-      if (this.mode === 'binaural') {
-        if (this.oscL && this.oscR) {
-          this.oscL.frequency.value = this.base - val / 2;
-          this.oscR.frequency.value = this.base + val / 2;
-        }
-      } else if (this.mod) {
-        this.mod.frequency.value = val;
+      if (this.oscL && this.oscR) {
+        this.oscL.frequency.value = this.base - val / 2;
+        this.oscR.frequency.value = this.base + val / 2;
       }
     },
     volume(val: number) {
@@ -136,42 +122,23 @@ export default defineComponent({
       this.ctx = new AudioContext();
       this.gain = this.ctx.createGain();
       this.gain.gain.value = this.volume / 100;
-      if (this.mode === 'binaural') {
-        const merger = this.ctx.createChannelMerger(2);
-        this.oscL = this.ctx.createOscillator();
-        this.oscR = this.ctx.createOscillator();
-        this.oscL.frequency.value = this.base - this.beat / 2;
-        this.oscR.frequency.value = this.base + this.beat / 2;
-        this.oscL.connect(merger, 0, 0);
-        this.oscR.connect(merger, 0, 1);
-        merger.connect(this.gain).connect(this.ctx.destination);
-        this.oscL.start();
-        this.oscR.start();
-      } else {
-        this.osc = this.ctx.createOscillator();
-        this.osc.frequency.value = this.base;
-        this.mod = this.ctx.createOscillator();
-        this.mod.type = 'square';
-        this.mod.frequency.value = this.beat;
-        const modGain = this.ctx.createGain();
-        modGain.gain.value = 0.5;
-        this.mod.connect(modGain).connect(this.gain.gain);
-        this.osc.connect(this.gain).connect(this.ctx.destination);
-        this.osc.start();
-        this.mod.start();
-      }
+      const merger = this.ctx.createChannelMerger(2);
+      this.oscL = this.ctx.createOscillator();
+      this.oscR = this.ctx.createOscillator();
+      this.oscL.frequency.value = this.base - this.beat / 2;
+      this.oscR.frequency.value = this.base + this.beat / 2;
+      this.oscL.connect(merger, 0, 0);
+      this.oscR.connect(merger, 0, 1);
+      merger.connect(this.gain).connect(this.ctx.destination);
+      this.oscL.start();
+      this.oscR.start();
       this.playing = true;
     },
     stop() {
-      if (this.mode === 'binaural') {
-        this.oscL?.stop();
-        this.oscR?.stop();
-      } else {
-        this.osc?.stop();
-        this.mod?.stop();
-      }
+      this.oscL?.stop();
+      this.oscR?.stop();
       this.ctx?.close();
-      this.oscL = this.oscR = this.osc = this.mod = null;
+      this.oscL = this.oscR = null;
       this.ctx = null;
       this.playing = false;
     },
