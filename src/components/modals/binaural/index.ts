@@ -1,1 +1,0 @@
-export { BinauralModal } from './binaural';
